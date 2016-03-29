@@ -21,7 +21,7 @@
 #
 ###################################################
 
-package pomfis;															#edit
+package pomfis;                                                         #edit
 
 use lib $ENV{'SHUTTER_ROOT'}.'/share/shutter/resources/modules';
 
@@ -51,88 +51,88 @@ my %upload_plugin_info = (
 
 binmode( STDOUT, ":utf8" );
 if ( exists $upload_plugin_info{$ARGV[ 0 ]} ) {
-	print $upload_plugin_info{$ARGV[ 0 ]};
-	exit;
+    print $upload_plugin_info{$ARGV[ 0 ]};
+    exit;
 }
 
 
 #don't touch this
 sub new {
-	my $class = shift;
+    my $class = shift;
 
-	#call constructor of super class (host, debug_cparam, shutter_root, gettext_object, main_gtk_window, ua)
-	my $self = $class->SUPER::new( shift, shift, shift, shift, shift, shift );
+    #call constructor of super class (host, debug_cparam, shutter_root, gettext_object, main_gtk_window, ua)
+    my $self = $class->SUPER::new( shift, shift, shift, shift, shift, shift );
 
-	bless $self, $class;
-	return $self;
+    bless $self, $class;
+    return $self;
 }
 
-#load some custom modules here (or do other custom stuff)	
+#load some custom modules here (or do other custom stuff)   
 sub init {
-	my $self = shift;
+    my $self = shift;
 
-	use JSON;				
-	use LWP::UserAgent;			
-	use HTTP::Request::Common;	
-	
-	return TRUE;	
+    use JSON;               
+    use LWP::UserAgent;         
+    use HTTP::Request::Common;  
+    
+    return TRUE;    
 }
 
 #handle 
 sub upload {
-	my ( $self, $upload_filename) = @_;
+    my ( $self, $upload_filename) = @_;
 
-	#store as object vars
-	$self->{_filename} = $upload_filename;
+    #store as object vars
+    $self->{_filename} = $upload_filename;
 
-	utf8::encode $upload_filename;
+    utf8::encode $upload_filename;
 
-	#examples related to the sub 'init'
-	my $json_coder = JSON::XS->new;
+    #examples related to the sub 'init'
+    my $json_coder = JSON::XS->new;
 
-	my $browser = LWP::UserAgent->new(
-		'timeout'    => 20,
-		'keep_alive' => 10,
-		'env_proxy'  => 1,
-	);
-	
-	#upload the file
-	my $client = LWP::UserAgent->new(
-			'timeout'    => 20,
-			'keep_alive' => 10,
-			'env_proxy'  => 1,
-	);
-	eval{
-		my $json = JSON->new();
+    my $browser = LWP::UserAgent->new(
+        'timeout'    => 20,
+        'keep_alive' => 10,
+        'env_proxy'  => 1,
+    );
+    
+    #upload the file
+    my $client = LWP::UserAgent->new(
+            'timeout'    => 20,
+            'keep_alive' => 10,
+            'env_proxy'  => 1,
+    );
+    eval{
+        my $json = JSON->new();
 
-		my %params = (
-				'files[]' => [$upload_filename],
-		);
-		my @params = (
-			"https://pomf.is/upload.php",
-			'Content_Type' => 'multipart/form-data',
-			'Content' => [%params]
-		);
-		my $req = HTTP::Request::Common::POST(@params);
-		my $rsp = $client->request($req); 
+        my %params = (
+                'files[]' => [$upload_filename],
+        );
+        my @params = (
+            "https://pomf.is/upload.php",
+            'Content_Type' => 'multipart/form-data',
+            'Content' => [%params]
+        );
+        my $req = HTTP::Request::Common::POST(@params);
+        my $rsp = $client->request($req); 
 
-		$self->{_links} = $json->decode( $rsp->content ); 
-		my $direct_link = $self->{_links}->{'files'}[0]->{url};
-		$self->{_links} = $self->{_links}->{'rsp'};
-		
-		#save all retrieved links to a hash, as an example:
-		$self->{_links}->{'direct_link'} = $direct_link;
+        $self->{_links} = $json->decode( $rsp->content ); 
+        my $direct_link = $self->{_links}->{'files'}[0]->{url};
+        $self->{_links} = $self->{_links}->{'rsp'};
+        
+        #save all retrieved links to a hash, as an example:
+        $self->{_links}->{'direct_link'} = $direct_link;
 
-		#set success code (200)
-		$self->{_links}{'status'} = 200;
-		
-	};
-	if($@){
-		$self->{_links}{'status'} = $@;
-	}
-	
-	#and return links
-	return %{ $self->{_links} };
+        #set success code (200)
+        $self->{_links}{'status'} = 200;
+        
+    };
+    if($@){
+        $self->{_links}{'status'} = $@;
+    }
+    
+    #and return links
+    return %{ $self->{_links} };
 }
 
 1;
