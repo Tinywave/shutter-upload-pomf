@@ -39,14 +39,14 @@ my $d = Locale::gettext->domain("shutter-plugins");
 $d->dir( $ENV{'SHUTTER_INTL'} );
 
 my %upload_plugin_info = (
-    'module'                    => "pomfis",#edit (must be the same as 'package')
-    'url'                       => "https://pomf.is/",#edit (the website's url)
-    'registration'              => "https://pomf.is/",#edit (a link to the registration page)
-    'name'                      => "pomf.is",#edit (the provider's name)
+    'module'                    => "pomfis",            #edit (must be the same as 'package')
+    'url'                       => "https://pomf.is/",  #edit (the website's url)
+    'registration'              => "https://pomf.is/",  #edit (a link to the registration page)
+    'name'                      => "pomf.is",           #edit (the provider's name)
     'description'               => "Upload screenshots to pomf.is",#edit (a description of the service)
-    'supports_anonymous_upload' => TRUE,#TRUE if you can upload *without* username/password
-    'supports_authorized_upload'=> FALSE,#TRUE if username/password are supported (might be in addition to anonymous_upload)
-    'supports_oauth_upload'     => FALSE,#TRUE if OAuth is used (see Dropbox.pm as an example)
+    'supports_anonymous_upload' => TRUE,                #TRUE if you can upload *without* username/password
+    'supports_authorized_upload'=> FALSE,               #TRUE if username/password are supported (might be in addition to anonymous_upload)
+    'supports_oauth_upload'     => FALSE,               #TRUE if OAuth is used (see Dropbox.pm as an example)
 );
 
 binmode( STDOUT, ":utf8" );
@@ -97,6 +97,7 @@ sub upload {
     );
     
     #upload the file
+    ## start by creating client
     my $client = LWP::UserAgent->new(
             'timeout'    => 20,
             'keep_alive' => 10,
@@ -104,23 +105,26 @@ sub upload {
     );
     eval{
         my $json = JSON->new();
-
+        # custom http-header for pomf
         my %params = (
                 'files[]' => [$upload_filename],
         );
+        # define client params
         my @params = (
             "https://pomf.is/upload.php",
-            'Content_Type' => 'multipart/form-data',
+            'Content_Type' => 'multipart/form-data', 
             'Content' => [%params]
         );
+        # create and execute request
         my $req = HTTP::Request::Common::POST(@params);
         my $rsp = $client->request($req); 
 
-        $self->{_links} = $json->decode( $rsp->content ); 
+        $self->{_links} = $json->decode( $rsp->content );
+        # get direct link to image from json-response
         my $direct_link = $self->{_links}->{'files'}[0]->{url};
         $self->{_links} = $self->{_links}->{'rsp'};
         
-        #save all retrieved links to a hash, as an example:
+        #save all retrieved links to a hash
         $self->{_links}->{'direct_link'} = $direct_link;
 
         #set success code (200)
