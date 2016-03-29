@@ -39,14 +39,14 @@ my $d = Locale::gettext->domain("shutter-plugins");
 $d->dir( $ENV{'SHUTTER_INTL'} );
 
 my %upload_plugin_info = (
-    'module'						=> "pomfis",						#edit (must be the same as 'package')
-	'url'							=> "https://pomf.is/",				#edit (the website's url)
-	'registration'  				=> "https://pomf.is/",				#edit (a link to the registration page)
-	'name'							=> "pomf.is",						#edit (the provider's name)
-	'description'					=> "Upload screenshots to pomf.is",	#edit (a description of the service)
-	'supports_anonymous_upload'	 	=> TRUE,							#TRUE if you can upload *without* username/password
-	'supports_authorized_upload' 	=> FALSE,							#TRUE if username/password are supported (might be in addition to anonymous_upload)
-	'supports_oauth_upload' 		=> FALSE,							#TRUE if OAuth is used (see Dropbox.pm as an example)
+    'module'                    => "pomfis",#edit (must be the same as 'package')
+    'url'                       => "https://pomf.is/",#edit (the website's url)
+    'registration'              => "https://pomf.is/",#edit (a link to the registration page)
+    'name'                      => "pomf.is",#edit (the provider's name)
+    'description'               => "Upload screenshots to pomf.is",#edit (a description of the service)
+    'supports_anonymous_upload' => TRUE,#TRUE if you can upload *without* username/password
+    'supports_authorized_upload'=> FALSE,#TRUE if username/password are supported (might be in addition to anonymous_upload)
+    'supports_oauth_upload'     => FALSE,#TRUE if OAuth is used (see Dropbox.pm as an example)
 );
 
 binmode( STDOUT, ":utf8" );
